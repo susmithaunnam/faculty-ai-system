@@ -6,16 +6,57 @@ import LeaveForm from "./pages/LeaveForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import Timetable from "./pages/Timetable";
 import Reports from "./pages/Reports";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   return (
     <Routes>
       <Route path="/" element={<Login />} />
-      <Route path="/faculty" element={<FacultyDashboard />} />
-      <Route path="/leave" element={<LeaveForm />} />
-      <Route path="/admin" element={<AdminDashboard />} />
-      <Route path="/timetable" element={<Timetable />} />
-      <Route path="/reports" element={<Reports />} />
+
+      <Route
+        path="/faculty"
+        element={
+          <ProtectedRoute requireRole="faculty">
+            <FacultyDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/leave"
+        element={
+          <ProtectedRoute requireRole="faculty">
+            <LeaveForm />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/admin"
+        element={
+          <ProtectedRoute requireRole="admin">
+            <AdminDashboard />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/timetable"
+        element={
+          <ProtectedRoute>
+            <Timetable />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/reports"
+        element={
+          <ProtectedRoute>
+            <Reports />
+          </ProtectedRoute>
+        }
+      />
     </Routes>
   );
 }

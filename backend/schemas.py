@@ -25,3 +25,13 @@ class SwapRequestCreate(BaseModel):
     requester_slot_id: str
     target_id: str
     target_slot_id: str
+
+
+class SubstituteOverride(BaseModel):
+    new_substitute_faculty_id: str
+
+
+class FacultySubjectAssign(BaseModel):
+    faculty_id: str
+    subject_id: str
+    proficiency: str = "primary"   # "primary" or "secondary"

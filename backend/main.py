@@ -1,7 +1,8 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database import supabase
-from routers import leave, timetable, swaps
+from auth import get_current_user
+from routers import leave, timetable, swaps, substitutes, directory, admin
 
 app = FastAPI(title="Smart Faculty Leave Management System")
 
@@ -18,6 +19,9 @@ app.add_middleware(
 app.include_router(leave.router)
 app.include_router(timetable.router)
 app.include_router(swaps.router)
+app.include_router(substitutes.router)
+app.include_router(directory.router)
+app.include_router(admin.router)
 
 
 @app.get("/")
@@ -29,3 +33,9 @@ def home():
 def test_database():
     response = supabase.table("profiles").select("*").execute()
     return {"data": response.data}
+
+
+@app.get("/me")
+def get_me(current_user: dict = Depends(get_current_user)):
+    """Tells the frontend who's logged in and what role they have."""
+    return {"data": current_user}
