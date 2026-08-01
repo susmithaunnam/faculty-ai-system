@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from database import supabase
 from auth import get_current_user
-from routers import leave, timetable, swaps, substitutes, directory, admin
+from routers import leave, timetable, swaps, substitutes, directory, admin, reports
 
 app = FastAPI(title="Smart Faculty Leave Management System")
 
@@ -22,6 +22,7 @@ app.include_router(swaps.router)
 app.include_router(substitutes.router)
 app.include_router(directory.router)
 app.include_router(admin.router)
+app.include_router(reports.router)
 
 
 @app.get("/")

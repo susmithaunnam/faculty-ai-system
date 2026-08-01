@@ -93,9 +93,17 @@ function AdminDashboard() {
           <h1 className="text-4xl font-bold text-cyan-400">Admin Dashboard</h1>
           <p className="text-gray-400 mt-1">Welcome, {profile?.full_name || "..."}</p>
         </div>
-        <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-lg h-fit">
-          Logout
-        </button>
+        <div className="flex gap-3 h-fit">
+          <button
+            onClick={() => navigate("/reports")}
+            className="bg-cyan-600 hover:bg-cyan-700 px-5 py-2 rounded-lg"
+          >
+            View Reports
+          </button>
+          <button onClick={handleLogout} className="bg-red-500 hover:bg-red-600 px-5 py-2 rounded-lg">
+            Logout
+          </button>
+        </div>
       </div>
 
       {error && <p className="text-red-400 mb-4">{error}</p>}
