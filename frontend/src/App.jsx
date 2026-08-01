@@ -5,6 +5,7 @@ import FacultyDashboard from "./pages/FacultyDashboard";
 import LeaveForm from "./pages/LeaveForm";
 import AdminDashboard from "./pages/AdminDashboard";
 import Timetable from "./pages/Timetable";
+import SwapRequests from "./pages/SwapRequests";
 import Reports from "./pages/Reports";
 import ProtectedRoute from "./components/ProtectedRoute";
 
@@ -45,6 +46,15 @@ function App() {
         element={
           <ProtectedRoute>
             <Timetable />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/swaps"
+        element={
+          <ProtectedRoute requireRole="faculty">
+            <SwapRequests />
           </ProtectedRoute>
         }
       />
