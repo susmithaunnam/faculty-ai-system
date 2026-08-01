@@ -121,7 +121,7 @@ function FacultyDashboard() {
         )}
       </section>
 
-      <section className="grid md:grid-cols-2 gap-6 p-8">
+      <section className="grid md:grid-cols-3 gap-6 p-8">
         <button
           onClick={() => navigate("/leave")}
           className="bg-cyan-500 hover:bg-cyan-600 p-6 rounded-2xl text-2xl font-bold"
@@ -134,6 +134,13 @@ function FacultyDashboard() {
           className="bg-purple-600 hover:bg-purple-700 p-6 rounded-2xl text-2xl font-bold"
         >
           View Timetable
+        </button>
+
+        <button
+          onClick={() => navigate("/swaps")}
+          className="bg-orange-500 hover:bg-orange-600 p-6 rounded-2xl text-2xl font-bold"
+        >
+          Swap Requests
         </button>
       </section>
     </div>
