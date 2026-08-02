@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Bot, CheckCircle2, AlertTriangle } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../lib/api";
 
 const DAY_LABELS = { 1: "Monday", 2: "Tuesday", 3: "Wednesday", 4: "Thursday", 5: "Friday", 6: "Saturday" };
@@ -10,6 +11,7 @@ const DAYS = [1, 2, 3, 4, 5, 6];
 function Timetable() {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const toast = useToast();
   const isAdmin = profile?.role === "admin";
 
   const [slots, setSlots] = useState([]);
@@ -18,7 +20,6 @@ function Timetable() {
   const [todayAllocationMap, setTodayAllocationMap] = useState({});
   const [sectionFilter, setSectionFilter] = useState("all");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   // JS getDay(): 0=Sunday...6=Saturday. Our schema: 1=Monday...6=Saturday, no Sunday.
   const jsToday = new Date().getDay();
@@ -33,7 +34,6 @@ function Timetable() {
 
   async function loadTimetable() {
     setLoading(true);
-    setError("");
     try {
       const [timetableRes, facultyRes, subjectsRes, allocationsRes] = await Promise.all([
         apiFetch(isAdmin ? "/timetable" : "/timetable/me"),
@@ -59,7 +59,7 @@ function Timetable() {
       allocationsRes.data.forEach((a) => { aMap[a.timetable_slot_id] = a; });
       setTodayAllocationMap(aMap);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -95,8 +95,6 @@ function Timetable() {
       <p className="text-gray-500 text-sm mb-6">
         Status reflects live substitute coverage for today ({DAY_LABELS[todayDayOfWeek] || "Sunday"}) only.
       </p>
-
-      {error && <p className="text-red-400 mb-4">{error}</p>}
 
       <div className="flex flex-wrap gap-2 mb-6">
         {DAYS.map((day) => (

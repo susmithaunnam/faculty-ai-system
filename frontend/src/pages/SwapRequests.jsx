@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../lib/api";
 import SwapForm from "../components/swaps/SwapForm";
 import RequestCard from "../components/swaps/RequestCard";
@@ -8,13 +9,12 @@ import RequestCard from "../components/swaps/RequestCard";
 function SwapRequests() {
   const navigate = useNavigate();
   const { profile } = useAuth();
+  const toast = useToast();
 
   const [requests, setRequests] = useState([]);
   const [mySlots, setMySlots] = useState([]);
   const [facultyList, setFacultyList] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
-  const [actionError, setActionError] = useState("");
 
   useEffect(() => {
     if (!profile) return;
@@ -23,7 +23,6 @@ function SwapRequests() {
 
   async function loadAll() {
     setLoading(true);
-    setError("");
     try {
       const [requestsRes, slotsRes, facultyRes] = await Promise.all([
         apiFetch("/swap-requests/me"),
@@ -34,14 +33,13 @@ function SwapRequests() {
       setMySlots(slotsRes.data);
       setFacultyList(facultyRes.data);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
   }
 
   const handleCreate = async (payload) => {
-    setActionError("");
     await apiFetch("/swap-requests", {
       method: "POST",
       body: JSON.stringify(payload),
@@ -49,13 +47,19 @@ function SwapRequests() {
     await loadAll();
   };
 
+  const ACTION_MESSAGES = {
+    accept: "Swap accepted — your timetable has been updated.",
+    reject: "Swap request rejected.",
+    cancel: "Swap request cancelled.",
+  };
+
   const runAction = async (swapId, action) => {
-    setActionError("");
     try {
       await apiFetch(`/swap-requests/${swapId}/${action}`, { method: "PATCH" });
+      toast.success(ACTION_MESSAGES[action] || "Done.");
       await loadAll();
     } catch (err) {
-      setActionError(err.message);
+      toast.error(err.message);
     }
   };
 
@@ -82,9 +86,6 @@ function SwapRequests() {
           ← Back to Dashboard
         </button>
       </div>
-
-      {error && <p className="text-red-400 mb-4">{error}</p>}
-      {actionError && <p className="text-red-400 mb-4">{actionError}</p>}
 
       {loading ? (
         <p className="text-gray-400">Loading...</p>

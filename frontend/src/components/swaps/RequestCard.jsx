@@ -1,4 +1,5 @@
 import StatusBadge from "./StatusBadge";
+import { DAY_LABELS_SHORT } from "../../lib/constants";
 
 function RequestCard({
   request,
@@ -32,7 +33,7 @@ function RequestCard({
           </p>
 
           <p>
-            Day {request.requester_slot?.day_of_week}
+            {DAY_LABELS_SHORT[request.requester_slot?.day_of_week] || request.requester_slot?.day_of_week}
             {" • "}
             Period {request.requester_slot?.period_number}
           </p>
@@ -50,7 +51,7 @@ function RequestCard({
           </p>
 
           <p>
-            Day {request.target_slot?.day_of_week}
+            {DAY_LABELS_SHORT[request.target_slot?.day_of_week] || request.target_slot?.day_of_week}
             {" • "}
             Period {request.target_slot?.period_number}
           </p>

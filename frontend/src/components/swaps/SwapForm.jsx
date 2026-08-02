@@ -1,20 +1,21 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../lib/api";
-
-const DAY_LABELS = { 1: "Mon", 2: "Tue", 3: "Wed", 4: "Thu", 5: "Fri", 6: "Sat" };
+import { DAY_LABELS_SHORT } from "../../lib/constants";
+import { useToast } from "../../context/ToastContext";
 
 function slotLabel(slot) {
-  return `${DAY_LABELS[slot.day_of_week] || slot.day_of_week} • Period ${slot.period_number} • ${slot.section}`;
+  return `${DAY_LABELS_SHORT[slot.day_of_week] || slot.day_of_week} • Period ${slot.period_number} • ${slot.section}`;
 }
 
 function SwapForm({ mySlots, facultyList, currentUserId, onSubmit }) {
+  const toast = useToast();
+
   const [requesterSlotId, setRequesterSlotId] = useState("");
   const [targetId, setTargetId] = useState("");
   const [targetSlotId, setTargetSlotId] = useState("");
   const [targetSlots, setTargetSlots] = useState([]);
   const [loadingTargetSlots, setLoadingTargetSlots] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-  const [error, setError] = useState("");
 
   const otherFaculty = facultyList.filter((f) => f.id !== currentUserId);
 
@@ -34,7 +35,7 @@ function SwapForm({ mySlots, facultyList, currentUserId, onSubmit }) {
         if (!cancelled) setTargetSlots(res.data);
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message);
+        if (!cancelled) toast.error(err.message);
       })
       .finally(() => {
         if (!cancelled) setLoadingTargetSlots(false);
@@ -52,7 +53,6 @@ function SwapForm({ mySlots, facultyList, currentUserId, onSubmit }) {
     if (!canSubmit) return;
 
     setSubmitting(true);
-    setError("");
     try {
       await onSubmit({
         requester_slot_id: requesterSlotId,
@@ -63,8 +63,9 @@ function SwapForm({ mySlots, facultyList, currentUserId, onSubmit }) {
       setTargetId("");
       setTargetSlotId("");
       setTargetSlots([]);
+      toast.success("Swap request sent.");
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setSubmitting(false);
     }
@@ -76,8 +77,6 @@ function SwapForm({ mySlots, facultyList, currentUserId, onSubmit }) {
       className="bg-slate-800 rounded-2xl p-6 shadow-lg space-y-5"
     >
       <h2 className="text-2xl font-bold text-cyan-400">Propose a Swap</h2>
-
-      {error && <p className="text-red-400">{error}</p>}
 
       <div>
         <label className="block text-gray-400 mb-2">Your class to give up</label>

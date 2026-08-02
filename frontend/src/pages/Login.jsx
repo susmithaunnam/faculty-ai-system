@@ -2,26 +2,26 @@ import { useState } from "react";
 import { User, Lock, GraduationCap } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../lib/api";
 
 function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
+  const toast = useToast();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError("");
     setSubmitting(true);
 
     const { error: loginError } = await login(email, password);
 
     if (loginError) {
-      setError(loginError.message);
+      toast.error(loginError.message);
       setSubmitting(false);
       return;
     }
@@ -30,7 +30,7 @@ function Login() {
       const me = await apiFetch("/me");
       navigate(me.data.role === "admin" ? "/admin" : "/faculty");
     } catch (err) {
-      setError("Logged in, but couldn't load your profile. Please try again.");
+      toast.error("Logged in, but couldn't load your profile. Please try again.");
     } finally {
       setSubmitting(false);
     }
@@ -77,10 +77,6 @@ function Login() {
               required
             />
           </div>
-
-          {error && (
-            <p className="text-red-400 text-sm mb-4 text-center">{error}</p>
-          )}
 
           <button
             type="submit"

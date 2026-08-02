@@ -1,18 +1,19 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../lib/api";
 
 function FacultyDashboard() {
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
+  const toast = useToast();
 
   const [leaveRequests, setLeaveRequests] = useState([]);
   const [classesToday, setClassesToday] = useState(0);
   const [todaysAllocation, setTodaysAllocation] = useState(null);
   const [substituteName, setSubstituteName] = useState("");
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     if (!profile) return;
@@ -45,7 +46,7 @@ function FacultyDashboard() {
           setSubstituteName(sub?.full_name || "a colleague");
         }
       } catch (err) {
-        setError(err.message);
+        toast.error(err.message);
       } finally {
         setLoading(false);
       }
@@ -73,8 +74,6 @@ function FacultyDashboard() {
           Logout
         </button>
       </header>
-
-      {error && <p className="text-red-400 text-center mt-4">{error}</p>}
 
       <section className="grid md:grid-cols-3 gap-6 p-8">
         <div className="bg-slate-800 rounded-2xl p-6 shadow-lg">

@@ -16,6 +16,7 @@ import {
   Legend,
 } from "recharts";
 import { apiFetch } from "../lib/api";
+import { useToast } from "../context/ToastContext";
 
 const COLORS = {
   cyan: "#22d3ee",
@@ -55,14 +56,14 @@ function ChartCard({ title, children }) {
 
 function Reports() {
   const navigate = useNavigate();
+  const toast = useToast();
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     apiFetch("/reports/summary")
       .then((res) => setReport(res.data))
-      .catch((err) => setError(err.message))
+      .catch((err) => toast.error(err.message))
       .finally(() => setLoading(false));
   }, []);
 
@@ -77,8 +78,6 @@ function Reports() {
           ← Back to Dashboard
         </button>
       </div>
-
-      {error && <p className="text-red-400 mb-4">{error}</p>}
 
       {loading ? (
         <p className="text-gray-400">Loading...</p>

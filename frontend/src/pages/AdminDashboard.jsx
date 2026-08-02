@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { useToast } from "../context/ToastContext";
 import { apiFetch } from "../lib/api";
 
 function AdminDashboard() {
   const navigate = useNavigate();
   const { profile, logout } = useAuth();
+  const toast = useToast();
 
   const [pendingLeaves, setPendingLeaves] = useState([]);
   const [facultyMap, setFacultyMap] = useState({});
   const [departmentMap, setDepartmentMap] = useState({});
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
   const [actionLoadingId, setActionLoadingId] = useState(null);
   const [results, setResults] = useState([]); // recently approved, with substitute assignments
 
@@ -21,7 +22,6 @@ function AdminDashboard() {
 
   async function loadData() {
     setLoading(true);
-    setError("");
     try {
       const [leavesRes, facultyRes, deptRes] = await Promise.all([
         apiFetch("/leave-requests?status=pending"),
@@ -39,7 +39,7 @@ function AdminDashboard() {
       deptRes.data.forEach((d) => { dMap[d.id] = d.name; });
       setDepartmentMap(dMap);
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setLoading(false);
     }
@@ -47,7 +47,6 @@ function AdminDashboard() {
 
   async function handleApprove(leave) {
     setActionLoadingId(leave.id);
-    setError("");
     try {
       await apiFetch(`/leave-requests/${leave.id}/approve`, { method: "PATCH" });
       const genRes = await apiFetch(`/substitute-allocations/generate/${leave.id}`, { method: "POST" });
@@ -61,8 +60,9 @@ function AdminDashboard() {
         ...prev,
       ]);
       setPendingLeaves((prev) => prev.filter((l) => l.id !== leave.id));
+      toast.success("Leave approved — substitutes assigned.");
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setActionLoadingId(null);
     }
@@ -70,12 +70,12 @@ function AdminDashboard() {
 
   async function handleReject(leave) {
     setActionLoadingId(leave.id);
-    setError("");
     try {
       await apiFetch(`/leave-requests/${leave.id}/reject`, { method: "PATCH" });
       setPendingLeaves((prev) => prev.filter((l) => l.id !== leave.id));
+      toast.success("Leave rejected.");
     } catch (err) {
-      setError(err.message);
+      toast.error(err.message);
     } finally {
       setActionLoadingId(null);
     }
@@ -105,8 +105,6 @@ function AdminDashboard() {
           </button>
         </div>
       </div>
-
-      {error && <p className="text-red-400 mb-4">{error}</p>}
 
       <div className="bg-slate-800 rounded-2xl p-6 shadow-lg mb-8">
         <h2 className="text-2xl font-bold mb-6">
